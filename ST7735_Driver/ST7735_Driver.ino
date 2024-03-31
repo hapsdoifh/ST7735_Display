@@ -18,8 +18,10 @@
 #define RASET 0x2B
 #define RAMWR 0x2C
 
+#define signed_max(a,b) (abs(a) > abs(b) ? a : b)
 
-SPISettings MySPISettings(100000,MSBFIRST,SPI_MODE0);
+
+SPISettings MySPISettings(1000000,MSBFIRST,SPI_MODE0);
 static char RegMap[D_WIDTH*D_HEIGHT];
 
 
@@ -47,10 +49,39 @@ unsigned int GenColorPercent(float R, float G, float B){
   return GenColor(int(R * 31), int(G * 63), int(B * 31));
 }
 
-void WritePixel(int x, int y, unsigned int Color){
+void DrawPixel(int x, int y, unsigned int Color){
   SetAddr(x,y);
   WriteCommand(RAMWR);
   SPI.transfer16(Color);
+}
+
+void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
+    int Cycles = signed_max((EndX - StartX),(EndY - StartY)), CycleSign = 1;
+    float Slope = float((EndY-StartY))/(EndX - StartX);
+    int StartMapping[] = {StartX, StartY};
+    int CoordMapping[] = {0,0}, default_mapping = 1;
+    if(Cycles < 0){
+        CycleSign = -1;
+        Cycles *= CycleSign;
+    }
+    if (abs(EndY - StartY) >= abs(EndX - StartX)){ //if line is longer vertically rise > run
+        Slope = 1/Slope;
+        default_mapping = 0;
+    }
+    for(int i = 0; i <= Cycles; i++){
+        CoordMapping[default_mapping] = int(StartMapping[default_mapping] + i*CycleSign); //default: CoordMapping[x,y] modified:CoordMapping[y,x]
+        CoordMapping[1 - default_mapping] = int(StartMapping[1-default_mapping] + i*CycleSign*Slope);
+
+        if(CoordMapping[0] >= 0 && CoordMapping[0] < 160 && CoordMapping[1] >= 0 && CoordMapping[1] < 128)
+        DrawPixel(CoordMapping[0], CoordMapping[1], Color);
+    }
+}
+
+void DrawRect(int StartX, int StartY, int EndX, int EndY, int Color){
+  DrawLine(StartX, StartY, EndX, StartY, Color);
+  DrawLine(StartX, StartY, StartX, EndY, Color);
+  DrawLine(EndX,EndY, StartX, EndY, Color);
+  DrawLine(EndX,EndY, EndX, StartY, Color);
 }
 
 void WriteParams(){}
@@ -120,7 +151,7 @@ void setup() {
   for(int i = 0; i<D_WIDTH*D_HEIGHT; i++){
     SPI.transfer16(0x00);
   }
-  WritePixel(10,10,GenColorPercent(0.5, 0.5, 0.5));
+  DrawRect(10,10,40,40,GenColorPercent(0.2, 0.3, 0.4));
 
 }
 

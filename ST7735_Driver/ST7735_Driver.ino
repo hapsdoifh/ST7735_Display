@@ -18,7 +18,7 @@
 #define RASET 0x2B
 #define RAMWR 0x2C
 
-#define signed_max(a,b) (abs(a) > abs(b) ? a : b)
+#define max(a,b) (abs(a) > abs(b) ? abs(a) : abs(b))
 
 
 SPISettings MySPISettings(1000000,MSBFIRST,SPI_MODE0);
@@ -29,10 +29,16 @@ void WriteCommand(unsigned char Command, unsigned char* Params = NULL, unsigned 
 
 // template<typename command, typename... VarArgs>
 // void WriteCommandVargs(command Command, VarArgs... Args);
+template<typename type>
+void Swap(type &a, type &b){
+  type c = a;
+  a = b;
+  b = c;
+}
 
 void SetAddr(int RowStart, int ColStart, int RowEnd = 0x7F, int ColEnd = 0x9F){
-  WriteCommandVargs(RASET, 0x00, RowStart, 0x00, RowEnd);
-  WriteCommandVargs(CASET, 0x00, ColStart, 0x00, ColEnd);
+  WriteCommandVargs(CASET, 0x00, RowStart, 0x00, RowEnd);
+  WriteCommandVargs(RASET, 0x00, ColStart, 0x00, ColEnd);
 }
 
 unsigned int GenColor(unsigned int R, unsigned int G, unsigned int B){
@@ -42,7 +48,7 @@ unsigned int GenColor(unsigned int R, unsigned int G, unsigned int B){
   return((R<<11) + (G<<5) + B);
 }
 
-unsigned int GenColorPercent(float R, float G, float B){
+unsigned int ColorRatio(float R, float G, float B){
   R = R <= 1.0 ? R : 1.0;
   G = G <= 1.0 ? G : 1.0;
   B = B <= 1.0 ? B : 1.0;
@@ -55,22 +61,55 @@ void DrawPixel(int x, int y, unsigned int Color){
   SPI.transfer16(Color);
 }
 
+// void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
+//     int Cycles = signed_max((EndX - StartX),(EndY - StartY)), CycleSign = 1;
+//     float Slope = float((EndY-StartY))/(EndX - StartX);
+//     int StartMapping[] = {StartX, StartY};
+//     int CoordMapping[] = {0,0}, default_mapping = 1;
+//     if(Cycles < 0){
+//         CycleSign = -1;
+//         Cycles *= CycleSign;
+//     }
+//     if (abs(EndY - StartY) >= abs(EndX - StartX)){ //if line is longer vertically rise > run
+//         Slope = 1/Slope;
+//         default_mapping = 0;
+//     }
+//     for(int i = 0; i <= Cycles; i++){
+//         CoordMapping[default_mapping] = int(StartMapping[default_mapping] + i*CycleSign); //default: CoordMapping[x,y] modified:CoordMapping[y,x]
+//         CoordMapping[1 - default_mapping] = int(StartMapping[1-default_mapping] + i*CycleSign*Slope);
+
+//         if(CoordMapping[0] >= 0 && CoordMapping[0] < 160 && CoordMapping[1] >= 0 && CoordMapping[1] < 128)
+//         DrawPixel(CoordMapping[0], CoordMapping[1], Color);
+//     }
+// }
+void do_swap(int* a, int* b){
+  int c = *a;
+  *a = *b;
+  *b = c;
+}
 void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
-    int Cycles = signed_max((EndX - StartX),(EndY - StartY)), CycleSign = 1;
-    float Slope = float((EndY-StartY))/(EndX - StartX);
+    if((abs(EndX - StartX) >= abs(EndY-StartY) && EndX < StartX) || (abs(EndX - StartX) < abs(EndY-StartY) && EndY < StartY)){
+      Swap<int>(StartX, EndX);
+      Swap<int>(StartY, EndY);
+    }
+    int Cycles = max((EndX - StartX),(EndY - StartY));
+    float Slope = 0;
     int StartMapping[] = {StartX, StartY};
     int CoordMapping[] = {0,0}, default_mapping = 1;
-    if(Cycles < 0){
-        CycleSign = -1;
-        Cycles *= CycleSign;
-    }
-    if (abs(EndY - StartY) >= abs(EndX - StartX)){ //if line is longer vertically rise > run
-        Slope = 1/Slope;
-        default_mapping = 0;
+
+    if (abs(EndY - StartY) > abs(EndX - StartX)){ //if line is longer vertically rise > run
+      if (EndY-StartY != 0){
+        Slope = float((EndX - StartX))/(EndY-StartY);
+      }
+    }else{
+      if (EndX - StartX != 0){
+        Slope = float((EndY-StartY))/(EndX - StartX);
+      }
+      default_mapping = 0;
     }
     for(int i = 0; i <= Cycles; i++){
-        CoordMapping[default_mapping] = int(StartMapping[default_mapping] + i*CycleSign); //default: CoordMapping[x,y] modified:CoordMapping[y,x]
-        CoordMapping[1 - default_mapping] = int(StartMapping[1-default_mapping] + i*CycleSign*Slope);
+        CoordMapping[default_mapping] = int(StartMapping[default_mapping] + i); //default: CoordMapping[x,y] modified:CoordMapping[y,x]
+        CoordMapping[1 - default_mapping] = int(StartMapping[1-default_mapping] + i*Slope);
 
         if(CoordMapping[0] >= 0 && CoordMapping[0] < 160 && CoordMapping[1] >= 0 && CoordMapping[1] < 128)
         DrawPixel(CoordMapping[0], CoordMapping[1], Color);
@@ -80,8 +119,8 @@ void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
 void DrawRect(int StartX, int StartY, int EndX, int EndY, int Color){
   DrawLine(StartX, StartY, EndX, StartY, Color);
   DrawLine(StartX, StartY, StartX, EndY, Color);
-  DrawLine(EndX,EndY, StartX, EndY, Color);
-  DrawLine(EndX,EndY, EndX, StartY, Color);
+  DrawLine(StartX, EndY, EndX,EndY, Color);
+  DrawLine(EndX, StartY, EndX, EndY, Color);
 }
 
 void WriteParams(){}
@@ -151,7 +190,9 @@ void setup() {
   for(int i = 0; i<D_WIDTH*D_HEIGHT; i++){
     SPI.transfer16(0x00);
   }
-  DrawRect(10,10,40,40,GenColorPercent(0.2, 0.3, 0.4));
+  DrawRect(40,10,10,40,ColorRatio(0.2, 0.3, 0.4));
+  DrawLine(10,40,50,10,ColorRatio(0.2, 0.3, 0.4));
+  DrawLine(10,10,50,40,ColorRatio(0.2, 0.3, 0.4));
 
 }
 

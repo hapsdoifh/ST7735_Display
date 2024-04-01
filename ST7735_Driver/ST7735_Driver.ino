@@ -27,66 +27,38 @@ static char RegMap[D_WIDTH*D_HEIGHT];
 
 void WriteCommand(unsigned char Command, unsigned char* Params = NULL, unsigned char NumParams = 0);
 
-// template<typename command, typename... VarArgs>
-// void WriteCommandVargs(command Command, VarArgs... Args);
 template<typename type>
 void Swap(type &a, type &b){
-  type c = a;
-  a = b;
-  b = c;
+    type c = a;
+    a = b;
+    b = c;
 }
 
 void SetAddr(int RowStart, int ColStart, int RowEnd = 0x7F, int ColEnd = 0x9F){
-  WriteCommandVargs(CASET, 0x00, RowStart, 0x00, RowEnd);
-  WriteCommandVargs(RASET, 0x00, ColStart, 0x00, ColEnd);
+    WriteCommandVargs(CASET, 0x00, RowStart, 0x00, RowEnd);
+    WriteCommandVargs(RASET, 0x00, ColStart, 0x00, ColEnd);
 }
 
 unsigned int GenColor(unsigned int R, unsigned int G, unsigned int B){
-  R = R <= 0x1F ? R : 0x1F;
-  G = G <= 0x3F ? G : 0x3F;
-  B = B <= 0x1F ? B : 0x1F;
-  return((R<<11) + (G<<5) + B);
+    R = R <= 0x1F ? R : 0x1F;
+    G = G <= 0x3F ? G : 0x3F;
+    B = B <= 0x1F ? B : 0x1F;
+    return((R<<11) + (G<<5) + B);
 }
 
 unsigned int ColorRatio(float R, float G, float B){
-  R = R <= 1.0 ? R : 1.0;
-  G = G <= 1.0 ? G : 1.0;
-  B = B <= 1.0 ? B : 1.0;
-  return GenColor(int(R * 31), int(G * 63), int(B * 31));
+    R = R <= 1.0 ? R : 1.0;
+    G = G <= 1.0 ? G : 1.0;
+    B = B <= 1.0 ? B : 1.0;
+    return GenColor(int(R * 31), int(G * 63), int(B * 31));
 }
 
 void DrawPixel(int x, int y, unsigned int Color){
-  SetAddr(x,y);
-  WriteCommand(RAMWR);
-  SPI.transfer16(Color);
+    SetAddr(x,y);
+    WriteCommand(RAMWR);
+    SPI.transfer16(Color);
 }
 
-// void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
-//     int Cycles = signed_max((EndX - StartX),(EndY - StartY)), CycleSign = 1;
-//     float Slope = float((EndY-StartY))/(EndX - StartX);
-//     int StartMapping[] = {StartX, StartY};
-//     int CoordMapping[] = {0,0}, default_mapping = 1;
-//     if(Cycles < 0){
-//         CycleSign = -1;
-//         Cycles *= CycleSign;
-//     }
-//     if (abs(EndY - StartY) >= abs(EndX - StartX)){ //if line is longer vertically rise > run
-//         Slope = 1/Slope;
-//         default_mapping = 0;
-//     }
-//     for(int i = 0; i <= Cycles; i++){
-//         CoordMapping[default_mapping] = int(StartMapping[default_mapping] + i*CycleSign); //default: CoordMapping[x,y] modified:CoordMapping[y,x]
-//         CoordMapping[1 - default_mapping] = int(StartMapping[1-default_mapping] + i*CycleSign*Slope);
-
-//         if(CoordMapping[0] >= 0 && CoordMapping[0] < 160 && CoordMapping[1] >= 0 && CoordMapping[1] < 128)
-//         DrawPixel(CoordMapping[0], CoordMapping[1], Color);
-//     }
-// }
-void do_swap(int* a, int* b){
-  int c = *a;
-  *a = *b;
-  *b = c;
-}
 void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
     if((abs(EndX - StartX) >= abs(EndY-StartY) && EndX < StartX) || (abs(EndX - StartX) < abs(EndY-StartY) && EndY < StartY)){
       Swap<int>(StartX, EndX);
@@ -95,21 +67,22 @@ void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
     int Cycles = max((EndX - StartX),(EndY - StartY));
     float Slope = 0;
     int StartMapping[] = {StartX, StartY};
-    int CoordMapping[] = {0,0}, default_mapping = 1;
+    int CoordMapping[] = {0,0}, defau_map = 1;
 
     if (abs(EndY - StartY) > abs(EndX - StartX)){ //if line is longer vertically rise > run
-      if (EndY-StartY != 0){
-        Slope = float((EndX - StartX))/(EndY-StartY);
-      }
+        if (EndY-StartY != 0){
+            Slope = float((EndX - StartX))/(EndY-StartY);
+        }
     }else{
-      if (EndX - StartX != 0){
-        Slope = float((EndY-StartY))/(EndX - StartX);
-      }
-      default_mapping = 0;
+        if (EndX - StartX != 0){
+            Slope = float((EndY-StartY))/(EndX - StartX);
+        }
+        defau_map = 0;
     }
     for(int i = 0; i <= Cycles; i++){
-        CoordMapping[default_mapping] = int(StartMapping[default_mapping] + i); //default: CoordMapping[x,y] modified:CoordMapping[y,x]
-        CoordMapping[1 - default_mapping] = int(StartMapping[1-default_mapping] + i*Slope);
+        int opp_map = 1 - defau_map;
+        CoordMapping[defau_map] = int(StartMapping[defau_map] + i); //default: CoordMapping[x,y] modified:CoordMapping[y,x]
+        CoordMapping[opp_map] = int(StartMapping[opp_map] + i*Slope);
 
         if(CoordMapping[0] >= 0 && CoordMapping[0] < 160 && CoordMapping[1] >= 0 && CoordMapping[1] < 128)
         DrawPixel(CoordMapping[0], CoordMapping[1], Color);
@@ -117,41 +90,81 @@ void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
 }
 
 void DrawRect(int StartX, int StartY, int EndX, int EndY, int Color){
-  DrawLine(StartX, StartY, EndX, StartY, Color);
-  DrawLine(StartX, StartY, StartX, EndY, Color);
-  DrawLine(StartX, EndY, EndX,EndY, Color);
-  DrawLine(EndX, StartY, EndX, EndY, Color);
+    DrawLine(StartX, StartY, EndX, StartY, Color);
+    DrawLine(StartX, StartY, StartX, EndY, Color);
+    DrawLine(StartX, EndY, EndX,EndY, Color);
+    DrawLine(EndX, StartY, EndX, EndY, Color);
 }
 
 void WriteParams(){}
 
 template<typename First, typename... VarArgs>
 void WriteParams(First first, VarArgs... Args){
-  SPI.transfer(first);
-  WriteParams(Args...);
+    SPI.transfer(first);
+    WriteParams(Args...);
 }
 
 template<typename command, typename... VarArgs>
 void WriteCommandVargs(command Command, VarArgs... Args){
-  digitalWrite(DC, LOW);
-  SPI.transfer(Command);
-  digitalWrite(DC, HIGH);
-  WriteParams(Args...);
+    digitalWrite(DC, LOW);
+    SPI.transfer(Command);
+    digitalWrite(DC, HIGH);
+    WriteParams(Args...);
 }
 
 void WriteCommand(unsigned char Command, unsigned char* Params = NULL, unsigned char NumParams = 0){
-  digitalWrite(DC, LOW);
-  SPI.transfer(Command);
-  digitalWrite(DC, HIGH);
-  for(int i = 0; i < NumParams; i++){
-    SPI.transfer(Params[i]);
-  }
+    digitalWrite(DC, LOW);
+    SPI.transfer(Command);
+    digitalWrite(DC, HIGH);
+    for(int i = 0; i < NumParams; i++){
+        SPI.transfer(Params[i]);
+    }
 }
 
 void HWReset(){
-  digitalWrite(RES, LOW);
-  delay(10);
-  digitalWrite(RES, HIGH);
+    digitalWrite(RES, LOW);
+    delay(10);
+    digitalWrite(RES, HIGH);
+}
+
+void DrawEllipse(int StartX, int StartY, int EndX, int EndY, int Color, int mapping = -1){
+    if((abs(EndX - StartX) >= abs(EndY-StartY) && EndX < StartX) || (abs(EndX - StartX) < abs(EndY-StartY) && EndY < StartY)){
+        Swap<int>(StartX, EndX);
+        Swap<int>(StartY, EndY);
+    }
+    int Orientation[][2] = {{StartX, EndX}, {StartY, EndY}};
+    int Cycles[2] = {(EndX - StartX),(EndY - StartY)};
+    int Center[2] = {(StartX+EndX)/2,(StartY+EndY)/2};
+    int Offset[2] = {abs(StartX-EndX)/2,abs(StartY-EndY)/2};
+    int VertexA = abs(EndX-StartX)/2, VertexB = abs(EndY-StartY)/2;
+    int Verticies[2] = {VertexA, VertexB};
+    int CoordMapping[2] = {0,0}, defau_map = 0;
+    if (abs(EndY - StartY) > abs(EndX - StartX)){ //if line is longer vertically rise > run
+        defau_map = 1;
+    }
+    if(mapping != -1){
+        defau_map = mapping;
+    }else{
+        DrawEllipse(StartX, StartY, EndX, EndY, Color, mapping = 1 - defau_map);
+    }
+    int opp_map = 1 - defau_map;
+    for(int i = 0; i <= Cycles[defau_map]; i++){
+        CoordMapping[defau_map] = int(i); //default: CoordMapping[x,y] modified:CoordMapping[y,x]
+        int X = CoordMapping[defau_map];
+        CoordMapping[opp_map] = sqrt(((1.0 - float( pow(X-Verticies[defau_map],2)) /(  float(pow(Verticies[defau_map],2)) ))) * pow(float(Verticies[opp_map]),2));
+
+        for(int j = 1; j > -2; j-=2){
+            int OffsetMapping[2] = {0, 0};
+            OffsetMapping[defau_map] = -Offset[defau_map];
+            int OutputMapping[] = {0,0};
+            CoordMapping[opp_map] *= j;
+            OutputMapping[defau_map] = Center[defau_map] + CoordMapping[defau_map] + OffsetMapping[defau_map];
+            OutputMapping[opp_map] = Center[opp_map] + CoordMapping[opp_map] + OffsetMapping[opp_map];
+            int XCoord = OutputMapping[0], YCoord = OutputMapping[1];
+            if(XCoord >= 0 && XCoord < 160 && YCoord >= 0 && YCoord < 128)
+              DrawPixel(XCoord, YCoord, Color);
+        }
+    }
 }
 
 void InitST7735(){
@@ -183,16 +196,16 @@ void InitST7735(){
 
 void setup() {
   // put your setup code here, to run once:
-  // memset(RegMap,0,sizeof(RegMap)/sizeof(char)); // divide by sizeof(char) for clarity to remind myself
   InitST7735();
   WriteCommand(RAMWR);
 
   for(int i = 0; i<D_WIDTH*D_HEIGHT; i++){
-    SPI.transfer16(0x00);
+    SPI.transfer16(0b0000000000000000);
   }
-  DrawRect(40,10,10,40,ColorRatio(0.2, 0.3, 0.4));
-  DrawLine(10,40,50,10,ColorRatio(0.2, 0.3, 0.4));
-  DrawLine(10,10,50,40,ColorRatio(0.2, 0.3, 0.4));
+//   DrawRect(40,10,10,40,ColorRatio(0.2, 0.3, 0.4));
+//   DrawLine(10,40,50,10,ColorRatio(0.2, 0.3, 0.4));
+  DrawEllipse(10,10,50,50,ColorRatio(0.9, 0.3, 0.4));
+//   DrawEllipse(10,10,50,50,ColorRatio(0.9, 0.3, 0.4));
 
 }
 

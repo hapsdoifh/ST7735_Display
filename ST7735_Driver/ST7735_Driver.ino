@@ -53,10 +53,14 @@ unsigned int ColorRatio(float R, float G, float B){
     return GenColor(int(R * 31), int(G * 63), int(B * 31));
 }
 
-void DrawPixel(int x, int y, unsigned int Color){
-    SetAddr(x,y);
-    WriteCommand(RAMWR);
-    SPI.transfer16(Color);
+void DrawPixel(int x, int y, unsigned int Color, int thickness = 1){
+    for(int Xoff = 0; Xoff < thickness; Xoff++){
+        for(int Yoff = 0; Yoff < thickness; Yoff++){
+            SetAddr(x+Xoff,y+Yoff);
+            WriteCommand(RAMWR);
+            SPI.transfer16(Color);
+        }
+    }
 }
 
 void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color){
@@ -145,7 +149,7 @@ void DrawEllipse(int StartX, int StartY, int EndX, int EndY, int Color, int mapp
     if(mapping != -1){
         defau_map = mapping;
     }else{
-        DrawEllipse(StartX, StartY, EndX, EndY, Color, mapping = 1 - defau_map);
+        DrawEllipse(StartX, StartY, EndX, EndY, Color, 1 - defau_map);
     }
     int opp_map = 1 - defau_map;
     for(int i = 0; i <= Cycles[defau_map]; i++){
@@ -162,7 +166,7 @@ void DrawEllipse(int StartX, int StartY, int EndX, int EndY, int Color, int mapp
             OutputMapping[opp_map] = Center[opp_map] + CoordMapping[opp_map] + OffsetMapping[opp_map];
             int XCoord = OutputMapping[0], YCoord = OutputMapping[1];
             if(XCoord >= 0 && XCoord < 160 && YCoord >= 0 && YCoord < 128)
-              DrawPixel(XCoord, YCoord, Color);
+              DrawPixel(XCoord, YCoord, Color, 2);
         }
     }
 }
@@ -203,13 +207,17 @@ void setup() {
     SPI.transfer16(0b0000000000000000);
   }
 //   DrawRect(40,10,10,40,ColorRatio(0.2, 0.3, 0.4));
-//   DrawLine(10,40,50,10,ColorRatio(0.2, 0.3, 0.4));
-  DrawEllipse(10,10,50,50,ColorRatio(0.9, 0.3, 0.4));
+  DrawLine(0,64,159,64,ColorRatio(0.2, 0.3, 0.4));
+  DrawLine(80,0,80,127,ColorRatio(0.2, 0.3, 0.4));
+  DrawEllipse(0,0,159,127,ColorRatio(0.9, 0.3, 0.4));
 //   DrawEllipse(10,10,50,50,ColorRatio(0.9, 0.3, 0.4));
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+    // WriteCommand(0x21);
+    // delay(500);
+    // WriteCommand(0x20);
+    // delay(500);
 }

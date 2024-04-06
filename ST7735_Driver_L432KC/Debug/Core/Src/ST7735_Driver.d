@@ -25,7 +25,7 @@ Core/Src/ST7735_Driver.o: ../Core/Src/ST7735_Driver.cpp \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
- ../Core/Inc/ST7735_Driver.h
+ ../Core/Inc/ST7735_Driver.h ../Core/Inc/ST7735_Fonts.h
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:
@@ -53,3 +53,4 @@ Core/Src/ST7735_Driver.o: ../Core/Src/ST7735_Driver.cpp \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h:
 ../Core/Inc/ST7735_Driver.h:
+../Core/Inc/ST7735_Fonts.h:

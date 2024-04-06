@@ -73,7 +73,7 @@ void DisplayInit(SPI_HandleTypeDef *hspi){
 	}
 	WriteCommand(RAMWR);
 	for(int i = 0; i<D_WIDTH*D_HEIGHT; i++){
-		unsigned char data = 0b0000000000000000;
+		unsigned int data = 0b0000000000000000;
 		HAL_SPI_Transmit(DisplayHandle, (uint8_t*)&data, 2, 100);
 	}
 
@@ -169,6 +169,18 @@ void DrawEllipse(int StartX, int StartY, int EndX, int EndY, int Color, int mapp
               DrawPixel(XCoord, YCoord, Color, 2);
         }
     }
+}
+
+void DrawCharacter(char Character, int StartX, int StartY){
+	SetAddr(StartX, StartY, StartX + 9, StartY + 9);
+	WriteCommand(RAMWR);
+	for(int i = 0; i < 100; i++){
+		uint16_t data = 0xffff;
+		if(CapFont[Character - 65][i] == 0){
+			data = 0x00;
+		}
+		HAL_SPI_Transmit(DisplayHandle, (uint8_t*)&data, 2, 100);
+	}
 }
 
 unsigned int GenColor(unsigned int R, unsigned int G, unsigned int B){

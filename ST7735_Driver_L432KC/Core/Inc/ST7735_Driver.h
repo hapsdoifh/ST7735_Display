@@ -9,6 +9,7 @@
 #define INC_ST7735_DRIVER_H_
 
 #include "stm32l4xx_hal.h"
+#include "ST7735_Fonts.h"
 #include <math.h>
 
 
@@ -47,4 +48,9 @@ void DrawLine(int StartX, int StartY, int EndX, int EndY, unsigned int Color);
 void DrawRect(int StartX, int StartY, int EndX, int EndY, int Color);
 
 void DrawEllipse(int StartX, int StartY, int EndX, int EndY, int Color, int mapping=-1);
+
+void DrawCharacter(char Character, int StartX, int StartY);
 #endif /* INC_ST7735_DRIVER_H_ */
+
+
+

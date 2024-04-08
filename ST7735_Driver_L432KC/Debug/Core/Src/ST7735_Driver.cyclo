@@ -8,12 +8,13 @@
 ../Core/Src/ST7735_Driver.cpp:128:6:void DrawRect(int, int, int, int, int)	1
 ../Core/Src/ST7735_Driver.cpp:135:6:void DrawEllipse(int, int, int, int, int, int)	13
 ../Core/Src/ST7735_Driver.cpp:174:6:void DrawCharacter(char, int, int)	3
-../Core/Src/ST7735_Driver.cpp:186:14:unsigned int GenColor(unsigned int, unsigned int, unsigned int)	1
-../Core/Src/ST7735_Driver.cpp:193:14:unsigned int ColorRatio(float, float, float)	4
+../Core/Src/ST7735_Driver.cpp:186:6:void DrawImage(uint16_t*)	2
+../Core/Src/ST7735_Driver.cpp:197:14:unsigned int GenColor(unsigned int, unsigned int, unsigned int)	1
+../Core/Src/ST7735_Driver.cpp:204:14:unsigned int ColorRatio(float, float, float)	4
 ../Core/Src/ST7735_Driver.cpp:30:6:) [with command = int; VarArgs = {int, int, int, int}]	1
 ../Core/Src/ST7735_Driver.cpp:15:6:void Swap(type&, type&) [with type = int]	1
-C:\ST\STM32CubeIDE_1.15.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/c++/12.3.1/cmath:415:5:constexpr typename __gnu_cxx::__promote_2<_Tp, _Up>::__type std::pow(_Tp, _Up) [with _Tp = int; _Up = int]	1
-C:\ST\STM32CubeIDE_1.15.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/c++/12.3.1/cmath:415:5:constexpr typename __gnu_cxx::__promote_2<_Tp, _Up>::__type std::pow(_Tp, _Up) [with _Tp = float; _Up = int]	1
+C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/c++/12.3.1/cmath:415:5:constexpr typename __gnu_cxx::__promote_2<_Tp, _Up>::__type std::pow(_Tp, _Up) [with _Tp = int; _Up = int]	1
+C:\ST\STM32CubeIDE_1.13.2\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.100.202403111256\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/c++/12.3.1/cmath:415:5:constexpr typename __gnu_cxx::__promote_2<_Tp, _Up>::__type std::pow(_Tp, _Up) [with _Tp = float; _Up = int]	1
 ../Core/Src/ST7735_Driver.cpp:24:6:) [with First = int; VarArgs = {int, int, int}]	1
 ../Core/Src/ST7735_Driver.cpp:24:6:) [with First = int; VarArgs = {int, int}]	1
 ../Core/Src/ST7735_Driver.cpp:24:6:) [with First = int; VarArgs = {int}]	1

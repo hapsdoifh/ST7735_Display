@@ -84,8 +84,8 @@ all: main-build
 main-build: ST7735_Driver_L432KC.elf secondary-outputs
 
 # Tool invocations
-ST7735_Driver_L432KC.elf ST7735_Driver_L432KC.map: $(OBJS) $(USER_OBJS) D:\STM32\ST7735_Driver_L432KC\STM32L432KCUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "ST7735_Driver_L432KC.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"D:\STM32\ST7735_Driver_L432KC\STM32L432KCUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ST7735_Driver_L432KC.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+ST7735_Driver_L432KC.elf ST7735_Driver_L432KC.map: $(OBJS) $(USER_OBJS) H:\Projects\ST7735\ST7735_Driver_L432KC\STM32L432KCUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-g++ -o "ST7735_Driver_L432KC.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"H:\Projects\ST7735\ST7735_Driver_L432KC\STM32L432KCUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ST7735_Driver_L432KC.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

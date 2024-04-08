@@ -79,7 +79,7 @@ void DisplayInit(SPI_HandleTypeDef *hspi){
 
 }
 
-void SetAddr(int RowStart, int ColStart, int RowEnd = 0x7F, int ColEnd = 0x9F){
+void SetAddr(int RowStart, int ColStart, int RowEnd = 0x9F, int ColEnd = 0x7F){
     WriteCommandVargs(CASET, 0x00, RowStart, 0x00, RowEnd);
     WriteCommandVargs(RASET, 0x00, ColStart, 0x00, ColEnd);
 }
@@ -180,6 +180,17 @@ void DrawCharacter(char Character, int StartX, int StartY){
 			data = 0x00;
 		}
 		HAL_SPI_Transmit(DisplayHandle, (uint8_t*)&data, 2, 100);
+	}
+}
+
+void DrawImage(uint16_t image[]){
+	SetAddr(0, 0);
+	WriteCommand(RAMWR);
+	for(int i = 0; i < D_HEIGHT * D_WIDTH; i++){
+		uint8_t Data = ((image[i] & 0xFF00) >> 8);
+		HAL_SPI_Transmit(DisplayHandle, (uint8_t*)&Data, 1, 100);
+		Data = (image[i] & 0xFF);
+		HAL_SPI_Transmit(DisplayHandle, (uint8_t*)&Data, 1, 100);
 	}
 }
 

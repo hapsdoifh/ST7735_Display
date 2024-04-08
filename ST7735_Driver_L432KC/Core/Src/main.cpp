@@ -112,6 +112,8 @@ int main(void)
   DrawCharacter('E',54 + 40,60);
   DrawCharacter('R',65 + 40,60);
   DrawCharacter('S',76 + 40,60);
+  HAL_Delay(1000);
+  DrawImage(ImageData);
   while (1)
   {
     /* USER CODE END WHILE */

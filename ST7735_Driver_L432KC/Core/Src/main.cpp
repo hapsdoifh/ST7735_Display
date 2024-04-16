@@ -99,7 +99,7 @@ int main(void)
   DisplayInit(&hspi1);
   DrawLine(0,64,159,64,ColorRatio(0.2, 0.3, 0.4));
   DrawLine(80,0,80,127,ColorRatio(0.2, 0.3, 0.4));
-  DrawEllipse(0,0,159,127,ColorRatio(0.9, 0.3, 0.4));
+  DrawEllipse(0,0,159,127,ColorRatio(1, 0, 0));
   int gap = 0;
 //  for(int i = 0; i < 10; i++){
 //	  DrawCharacter(i + 65, i * 10 + gap, 10);

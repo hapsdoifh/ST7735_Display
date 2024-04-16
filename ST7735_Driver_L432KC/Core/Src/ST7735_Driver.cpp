@@ -175,9 +175,10 @@ void DrawCharacter(char Character, int StartX, int StartY, uint16_t ForegndColor
 	SetAddr(StartX, StartY, StartX + 9, StartY + 9);
 	WriteCommand(RAMWR);
 	for(int i = 0; i < 100; i++){
-		uint16_t data = ForegndColor;
+		uint16_t data[] = {(ForegndColor & 0xFF00) >> 8, ForegndColor & 0xFF};
 		if(CapFont[Character - 65][i] == 0){
-			data = BckgndColor;
+			data[0] = (BckgndColor & 0xFF00) >> 8;
+			data[1] = BckgndColor & 0xFF;
 		}
 		HAL_SPI_Transmit(DisplayHandle, (uint8_t*)&data, 2, 100);
 	}

@@ -105,15 +105,9 @@ int main(void)
 //	  DrawCharacter(i + 65, i * 10 + gap, 10);
 //	  gap++;
 //  }
-  DrawCharacter('P',10 + 40,60);
-  DrawCharacter('O',21 + 40,60);
-  DrawCharacter('G',32 + 40,60);
-  DrawCharacter('G',43 + 40,60);
-  DrawCharacter('E',54 + 40,60);
-  DrawCharacter('R',65 + 40,60);
-  DrawCharacter('S',76 + 40,60);
+  WriteText("HELLO", sizeof("HELLO")/sizeof(char), 60, 40, ColorRatio(0,1,0), ColorRatio(0,1,0));
   HAL_Delay(1000);
-  DrawImage(ImageData);
+//  DrawImage(ImageData);
   while (1)
   {
     /* USER CODE END WHILE */

@@ -171,15 +171,23 @@ void DrawEllipse(int StartX, int StartY, int EndX, int EndY, int Color, int mapp
     }
 }
 
-void DrawCharacter(char Character, int StartX, int StartY){
+void DrawCharacter(char Character, int StartX, int StartY, uint16_t ForegndColor, uint16_t BckgndColor){
 	SetAddr(StartX, StartY, StartX + 9, StartY + 9);
 	WriteCommand(RAMWR);
 	for(int i = 0; i < 100; i++){
-		uint16_t data = 0xffff;
+		uint16_t data = ForegndColor;
 		if(CapFont[Character - 65][i] == 0){
-			data = 0x00;
+			data = BckgndColor;
 		}
 		HAL_SPI_Transmit(DisplayHandle, (uint8_t*)&data, 2, 100);
+	}
+}
+
+void WriteText(char* text, int length, int StartX, int StartY, uint16_t ForegndColor, uint16_t BckgndColor){
+	const int TextGap = 3;
+	for(int i = 0; i < length - 1; i++){
+		DrawCharacter(text[i], StartX, StartY, ForegndColor, BckgndColor);
+		StartX += 9;
 	}
 }
 
@@ -207,3 +215,5 @@ unsigned int ColorRatio(float R, float G, float B){
     B = B <= 1.0 ? B : 1.0;
     return GenColor(int(R * 31), int(G * 63), int(B * 31));
 }
+
+

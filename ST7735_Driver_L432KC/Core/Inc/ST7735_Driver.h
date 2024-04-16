@@ -50,7 +50,9 @@ void DrawRect(int StartX, int StartY, int EndX, int EndY, int Color);
 
 void DrawEllipse(int StartX, int StartY, int EndX, int EndY, int Color, int mapping=-1);
 
-void DrawCharacter(char Character, int StartX, int StartY);
+void DrawCharacter(char Character, int StartX, int StartY, uint16_t ForegndColor = 0xffff, uint16_t BckgndColor = 0);
+
+void WriteText(char* text, int length, int StartX, int StartY, uint16_t ForegndColor = 0xffff, uint16_t BckgndColor = 0);
 
 void DrawImage(uint16_t image[]);
 #endif /* INC_ST7735_DRIVER_H_ */

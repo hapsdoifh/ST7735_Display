@@ -1,4 +1,0 @@
-../Core/Src/ST7735_Driver.cpp:14:6:void WriteParams()	4	static
-../Core/Src/ST7735_Driver.cpp:30:6:void WriteCommand(unsigned char, unsigned char*, unsigned char)	24	static
-../Core/Src/ST7735_Driver.cpp:39:6:void HWReset()	8	static
-../Core/Src/ST7735_Driver.cpp:45:6:void DisplayInit(SPI_HandleTypeDef*)	64	static

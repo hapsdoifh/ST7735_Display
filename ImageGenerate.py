@@ -1,6 +1,6 @@
 from PIL import Image
 
-im = Image.open("test_image3.jpg")
+im = Image.open("test_image1.jpg")
 
 pix = im.load()
 
